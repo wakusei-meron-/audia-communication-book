@@ -1,3 +1,0 @@
-# ~/.ipython/profile_default/startup/00-import_list.ipyに配置
-import matplotlib.pyplot as plt
-import numpy as np

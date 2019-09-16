@@ -1,4 +1,0 @@
-numpy == 1.15.0
-scipy == 1.0.0
-PyAudio == 0.2.11
--e git://github.com/wakusei-meron-/pyHammingCode.git#egg=pyHammingCode
