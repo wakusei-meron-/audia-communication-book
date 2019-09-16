@@ -6,7 +6,7 @@
 $ python controller.py
 ```
 
-[音波リモコン](https://wakusei-meron-.github.io/audia-communication-book/)
+[音波リモコン(WEB版)](https://wakusei-meron-.github.io/audia-communication-book/)
 
 ## 受信システムの起動
 
