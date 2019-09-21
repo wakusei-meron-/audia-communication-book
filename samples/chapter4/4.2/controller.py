@@ -2,16 +2,16 @@ import common
 import numpy as np
 import scipy.io.wavfile as siw
 import pyaudio
-import wave
 import tkinter as tk
 import threading
+import wave
 
 
 # 文字列を2進数のnumpy配列に変換
 def encode(messages):
     # 10進数を2進数文字列に変換
     def int2bin(s):
-        return str(s) if s <= 1 else int2bin(s>>1) +  str(s&1)
+        return str(s) if s <= 1 else int2bin(s >> 1) + str(s & 1)
 
     # 文字を8ビット文字列に変換
     def chr2bytestr(c):
@@ -109,7 +109,6 @@ def play(send_message):
     hamming_codes = gen_hamming_code(bin_data)
     print(hamming_codes)
     fsk_wav = modulation(hamming_codes)
-    print(fsk_wav)
     audio_filename = "fsk_{}.wav".format(send_message)
     siw.write(audio_filename, common.SR, fsk_wav)
     play_audio(audio_filename)

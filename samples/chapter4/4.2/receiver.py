@@ -1,18 +1,9 @@
+import common
+import numpy as np
+import pyaudio
 import threading
 import tkinter as tk
 from enum import Enum
-
-import numpy as np
-import pyaudio
-
-import common
-
-
-# 状態のEnumの定義
-class Status(Enum):
-    WAIT = 1  # SYNコードの受付状態
-    READY = 2  # 入力受付状態
-
 
 # 定数
 CHUNK = int(common.SR * common.PERIOD)  # バッファ
@@ -23,9 +14,15 @@ global status_text
 global button
 
 
+# 状態のEnumの定義
+class Status(Enum):
+    WAIT = 1   # SYNコードの受付状態
+    READY = 2  # 入力受付状態
+
+
 # 8ビットずつ読み込んで復号化する
 def decode(data):
-    if len(data) % 8 != 0:  # or len(data) < 8:
+    if len(data) % 8 != 0:
         raise Exception("invalid length")
     if len(data) > 8:
         return data + decode(data[8:])
@@ -111,25 +108,29 @@ def listen():
             status_text.set("ready")
             input_bin_data = np.r_[input_bin_data, signal]
 
+            print("input bin data", input_bin_data)
+
+            # 信号の受信に失敗した場合は状態を戻す
             if np.all(recent_bin_data == -1):
+                button.configure(state=tk.NORMAL)
                 status_text.set("error")
                 break
 
             # SYNコードか判定
-            if check_syn(recent_bin_data):
+            if len(input_bin_data) % 16 == 0 and check_syn(recent_bin_data):
                 # 直近8ビットがsynコードなので入力データから除外
-                # input_bin_data = input_bin_data[:-8]
                 input_bin_data = input_bin_data[:-16]
+
+                # 成功処理
+                correct_data = correct_hamming_code(input_bin_data)
+                message = decode(correct_data)
+                end(message)
                 break
 
     # PyAudioの終了処理
     stream.stop_stream()
     stream.close()
     p.terminate()
-
-    correct_data = correct_hamming_code(input_bin_data)
-    message = decode(correct_data)
-    end(message)
 
 
 # 受信データを元にウィンドウの背景色を変える
@@ -176,7 +177,6 @@ root = tk.Tk()
 root.title("音波リモコン(受信側)")
 root.geometry("400x300")
 status_text = tk.StringVar()
-# status_text.set("done")
 status_label = tk.Label(root, textvariable=status_text)
 status_label.pack()
 button = tk.Button(root, text="start", command=click_event)
